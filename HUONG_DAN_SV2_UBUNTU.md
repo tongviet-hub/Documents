@@ -191,13 +191,20 @@ node -v        # phải ≥ v22
 git clone <link-repo-của-nhóm> ~/school-portal
 cd ~/school-portal/frontend
 npm ci
-npm run build   # ra thư mục frontend/dist
+npm run build   # ra thư mục ~/school-portal/frontend/dist
+
+# Chép bản build ra ~/dist để các lệnh ở dưới dùng chung một đường dẫn với cách 1
+rm -rf ~/dist && cp -r ~/school-portal/frontend/dist ~/dist
 ```
 > ⚠️ **Không chép `node_modules` từ Windows sang Ubuntu** (chứa file nhị phân của Windows, sẽ lỗi). Luôn `npm ci` lại trên Ubuntu.
 
 > 💡 Tài liệu tải về nằm ở `frontend/public/tai-lieu/` (đã có `thong-bao-mau.txt` để test KT1). Thêm tài liệu thật thì bỏ vào đó rồi build lại.
 
-Từ giờ gọi thư mục vừa có là `~/dist` (cách 1) hoặc `~/school-portal/frontend/dist` (cách 2). **Sửa đường dẫn cho đúng ở các lệnh dưới.**
+**Dù làm cách nào, kết quả cuối cùng là thư mục `~/dist` trên Ubuntu** (cách 1: do `scp` tạo; cách 2: do lệnh `cp` ở trên). Các lệnh từ C3 trở đi đều dùng `~/dist`. Kiểm tra trước khi sang bước sau:
+```bash
+ls ~/dist          # phải thấy: index.html  assets  tai-lieu ...
+```
+> Bản gốc của thư mục này là `frontend/dist` trong repo (sinh ra bởi `npm run build`). Mỗi lần sửa web, cậu build lại rồi **chép lại vào `~/dist`** trước khi chạy `rsync` ở C3.
 
 ## C2. Cài Nginx
 
@@ -216,7 +223,10 @@ Cài xong Nginx **tự chạy** ngay. Mở `http://localhost` trong trình duy�
 # 1) Tài khoản hệ thống: không có thư mục home, KHÔNG đăng nhập được
 sudo useradd --system --no-create-home --shell /usr/sbin/nologin svc_nginx
 
-# 2) Thư mục nội dung + chép web vào (dấu / ở cuối ~/dist/ quan trọng: chép "ruột" thư mục)
+# 2) Thư mục nội dung + chép web vào
+#    ~/dist = bản build của frontend (gốc là frontend/dist trong repo, xem C1)
+#    Dấu / ở cuối ~/dist/ quan trọng: chép "ruột" thư mục
+ls ~/dist/index.html                  # phải tồn tại; nếu báo "No such file" thì quay lại C1
 sudo mkdir -p /var/www/school
 sudo rsync -a --delete ~/dist/ /var/www/school/
 
