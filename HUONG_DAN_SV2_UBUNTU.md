@@ -236,10 +236,11 @@ sudo chown -R root:svc_nginx /var/www/school
 sudo find /var/www/school -type d -exec chmod 750 {} \;
 sudo find /var/www/school -type f -exec chmod 640 {} \;
 ```
-Đọc kết quả:
+Đọc kết quả (**phải có `sudo`**: tài khoản của cậu là "người khác" nên không có quyền vào thư mục này; nếu gõ không `sudo` mà báo `Permission denied` là **đúng thiết kế**, không phải lỗi):
 ```bash
-ls -l /var/www/school
-namei -l /var/www/school/index.html
+sudo ls -l /var/www/school
+sudo namei -l /var/www/school/index.html            # quyền của từng thư mục dọc đường (nhìn như root)
+sudo -u svc_nginx namei -l /var/www/school/index.html   # nhìn đúng như tài khoản chạy Nginx
 ```
 Giải thích số quyền: `750` = chủ **rwx**, nhóm **r-x**, người khác **---**. `640` = chủ rw-, nhóm r--, người khác ---.
 (Thư mục cần `x` để "đi vào"; file chỉ cần `r` để đọc.)
@@ -787,7 +788,7 @@ sudo rsync -a --delete ~/dist/ /var/www/school/
 sudo chown -R root:svc_nginx /var/www/school
 sudo find /var/www/school -type d -exec chmod 750 {} \;
 sudo find /var/www/school -type f -exec chmod 640 {} \;
-ls -l /var/www/school && namei -l /var/www/school/index.html
+sudo ls -l /var/www/school && sudo namei -l /var/www/school/index.html     # có sudo; không sudo sẽ "Permission denied" (bình thường)
 sudo -u svc_nginx cat /var/www/school/index.html | head -3        # ✅ đọc được
 sudo -u svc_nginx touch /var/www/school/hack.txt                  # ✅ Permission denied
 sudo -u nobody cat /var/www/school/index.html                     # ✅ Permission denied
