@@ -77,7 +77,183 @@ systemctl status nginx | cat
 - Mở `http://truong.test/tai-lieu/thong-bao-mau.txt`
 
 ---
+viet@viet-BATTLE-AX-B760M-T-WIFI:~$ lsb_release -ds
+Ubuntu 26.04.1 LTS
+viet@viet-BATTLE-AX-B760M-T-WIFI:~$ ip -4 addr show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+2: enp5s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    altname enx8c322322c841
+    inet 192.168.102.114/24 brd 192.168.102.255 scope global dynamic noprefixroute enp5s0
+       valid_lft 6179sec preferred_lft 6179sec
+4: tailscale0: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1280 qdisc fq_codel state UNKNOWN group default qlen 500
+    inet 100.83.219.103/32 scope global tailscale0
+       valid_lft forever preferred_lft forever
+viet@viet-BATTLE-AX-B760M-T-WIFI:~$ uname -r
+7.0.0-42-generic
+viet@viet-BATTLE-AX-B760M-T-WIFI:~$ nginx -v
+nginx version: nginx/1.28.3 (Ubuntu)
+viet@viet-BATTLE-AX-B760M-T-WIFI:~$ systemctl status nginx --no-paper
+systemctl: unrecognized option '--no-paper'
+viet@viet-BATTLE-AX-B760M-T-WIFI:~$ systemctl status nginx | cat
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; preset: enabled)
+     Active: active (running) since Thu 2026-11-05 08:11:23 +07; 1 day 2h ago
+ Invocation: 1836d047b6684462b3a587f4adaf9a96
+       Docs: man:nginx(8)
+   Main PID: 46587 (nginx)
+      Tasks: 13 (limit: 37634)
+     Memory: 11M (peak: 12.8M)
+        CPU: 90ms
+     CGroup: /system.slice/nginx.service
+             ├─46587 "nginx: master process /usr/sbin/nginx -g daemon on; master_process on;"
+             ├─46588 "nginx: worker process"
+             ├─46589 "nginx: worker process"
+             ├─46590 "nginx: worker process"
+             ├─46591 "nginx: worker process"
+             ├─46592 "nginx: worker process"
+             ├─46593 "nginx: worker process"
+             ├─46594 "nginx: worker process"
+             ├─46596 "nginx: worker process"
+             ├─46597 "nginx: worker process"
+             ├─46598 "nginx: worker process"
+             ├─46599 "nginx: worker process"
+             └─46600 "nginx: worker process"
 
+Nov 05 08:11:23 viet-BATTLE-AX-B760M-T-WIFI systemd[1]: Starting nginx.service - A high performance web server and a reverse proxy server...
+Nov 05 08:11:23 viet-BATTLE-AX-B760M-T-WIFI systemd[1]: Started nginx.service - A high performance web server and a reverse proxy server.
+viet@viet-BATTLE-AX-B760M-T-WIFI:~$ ls -l /var/www/school
+namei -l /var/www/school/index.html
+id svc_nginx
+ls: cannot open directory '/var/www/school': Permission denied
+f: /var/www/school/index.html
+drwxr-xr-x root root      /
+drwxr-xr-x root root      var
+drwxr-xr-x root root      www
+drwxr-x--- root svc_nginx school
+                           index.html - Permission denied
+uid=997(svc_nginx) gid=973(svc_nginx) groups=973(svc_nginx)
+viet@viet-BATTLE-AX-B760M-T-WIFI:~$ sudo -u svc_nginx cat /var/www/school/index.html | head -3
+sudo -u svc_nginx touch /var/www/school/hack.txt
+sudo -u nobody cat /var/www/school/index.html
+[sudo: authenticate] Password:  
+<!doctype html>
+<html lang="vi">
+  <head>
+touch: cannot touch '/var/www/school/hack.txt': Permission denied
+cat: /var/www/school/index.html: Permission denied
+viet@viet-BATTLE-AX-B760M-T-WIFI:~$ sudo -u nobody cat /var/www/school/index.html
+cat: /var/www/school/index.html: Permission denied
+viet@viet-BATTLE-AX-B760M-T-WIFI:~$ cat /etc/hosts
+getent hosts truong.test
+ping -c 2 truong.test
+127.0.0.1 localhost
+127.0.1.1 viet-BATTLE-AX-B760M-T-WIFI
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+127.0.0.1    truong.test
+127.0.0.1       truong.test
+PING truong.test (127.0.0.1) 56(84) bytes of data.
+64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.019 ms
+64 bytes from localhost (127.0.0.1): icmp_seq=2 ttl=64 time=0.079 ms
+
+--- truong.test ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1039ms
+rtt min/avg/max/mdev = 0.019/0.049/0.079/0.030 ms
+viet@viet-BATTLE-AX-B760M-T-WIFI:~$ sudo ufw status numbered
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] OpenSSH                    ALLOW IN    Anywhere                  
+[ 2] 80/tcp                     ALLOW IN    192.168.102.0/24          
+[ 3] 80/tcp on tailscale0       ALLOW IN    Anywhere                  
+[ 4] OpenSSH (v6)               ALLOW IN    Anywhere (v6)             
+[ 5] 80/tcp (v6) on tailscale0  ALLOW IN    Anywhere (v6)             
+
+viet@viet-BATTLE-AX-B760M-T-WIFI:~$ cat /etc/nginx/sites-available/school
+grep -n '^user' /etc/nginx/nginx.conf
+ls -l /etc/nginx/sites-enabled/
+# ===== Website trường học (Đề tài 05) =====
+server {
+    listen      80;                          # cổng dịch vụ
+    server_name truong.test;                 # tên miền nội bộ
+
+    root  /var/www/school;                   # THƯ MỤC NỘI DUNG
+    index index.html;
+
+    access_log /var/log/nginx/school.access.log school;   # log truy cập
+    error_log  /var/log/nginx/school.error.log  warn;     # log lỗi
+
+    server_tokens off;                       # ẩn số phiên bản Nginx (bảo mật cơ bản)
+
+    gzip on;                                 # nén bớt dữ liệu cho nhẹ
+    gzip_types text/css application/javascript application/json image/svg+xml;
+
+    # Ứng dụng React: đường dẫn không phải file thật → trả index.html để React tự xử lý (/grades, /schedule...)
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # File giao diện: cho trình duyệt nhớ 7 ngày
+    location /assets/ {
+        expires 7d;
+    }
+
+    # Tài liệu tải về: không có file thì trả 404 thật (để quan sát mã HTTP)
+    location /tai-lieu/ {
+        try_files $uri =404;
+    }
+
+    # Chặn file ẩn (.git, .env...)
+    location ~ /\. {
+        deny all;
+    }
+}
+1:user svc_nginx;
+total 0
+lrwxrwxrwx 1 root root 33 Nov  5 08:06 school -> /etc/nginx/sites-available/school
+viet@viet-BATTLE-AX-B760M-T-WIFI:~$ sudo nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+viet@viet-BATTLE-AX-B760M-T-WIFI:~$ sudo systemctl restart nginx
+systemctl status nginx | cat
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; preset: enabled)
+     Active: active (running) since Fri 2026-11-06 10:59:22 +07; 12ms ago
+ Invocation: 763a6b5272a2429c96f57d521a5708a9
+       Docs: man:nginx(8)
+    Process: 79586 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+    Process: 79589 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+   Main PID: 79591 (nginx)
+      Tasks: 13 (limit: 37634)
+     Memory: 12.2M (peak: 12.2M)
+        CPU: 74ms
+     CGroup: /system.slice/nginx.service
+             ├─79591 "nginx: master process /usr/sbin/nginx -g daemon on; master_process on;"
+             ├─79592 "nginx: worker process"
+             ├─79593 "nginx: worker process"
+             ├─79594 "nginx: worker process"
+             ├─79595 "nginx: worker process"
+             ├─79596 "nginx: worker process"
+             ├─79597 "nginx: worker process"
+             ├─79598 "nginx: worker process"
+             ├─79600 "nginx: worker process"
+             ├─79601 "nginx: worker process"
+             ├─79602 "nginx: worker process"
+             ├─79603 "nginx: worker process"
+             └─79604 "nginx: worker process"
+
+Nov 06 10:59:22 viet-BATTLE-AX-B760M-T-WIFI systemd[1]: Starting nginx.service - A high performance web server and a reverse proxy server...
+Nov 06 10:59:22 viet-BATTLE-AX-B760M-T-WIFI systemd[1]: Started nginx.service - A high performance web server and a reverse proxy server.
+
+---
 ## Phần 2 – C7: bằng chứng "ít quyền" (quan trọng nhất)
 
 ### Ảnh 11 – Master = root, worker = svc_nginx
